@@ -59,11 +59,14 @@ class SendGridAPIClient(object):
         self.version = __version__
         self.useragent = 'sendgrid/{};python'.format(self.version)
 
-        self.client = python_http_client.Client(
+        self.client = self.get_client()
+
+    def get_client(self):
+        return python_http_client.Client(
             host=self.host,
             request_headers=self._default_headers,
             version=3)
-
+    
     @property
     def _default_headers(self):
         """Set the default header for a Twilio SendGrid v3 API call"""
