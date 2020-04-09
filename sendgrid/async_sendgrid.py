@@ -46,22 +46,16 @@ class AsyncSendGridAPIClient(SendGridAPIClient):
         if not self.use_external_session:
             await self.close_client_session()
 
+    @property
+    def client_session(self):
+        return self._client_session
+
     def get_client(self):
         return python_http_client.AsyncClient(
             host=self.host,
             client_session=self.client_session,
             request_headers=self._default_headers,
             version=3)
-
-    @property
-    def client_session(self):
-        return self._client_session
-
-    @client_session.setter
-    def client_session(self, session):
-        if not self.use_external_session:
-            self.use_external_session = session != self._client_session
-        self._client_session = session
 
     async def close_client_session(self):
         if not self.use_external_session:
