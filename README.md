@@ -169,6 +169,32 @@ print(response.body)
 print(response.headers)
 ```
 
+## Asynchronous Client
+
+To enable asyncio support install the package with `async` extra:
+
+    pip install sendgrid[async]
+
+```python
+import asyncio
+
+from sendgrid.async_sendgrid import AsyncSendGridAPIClient
+from sendgrid.helpers.mail import *
+
+async def send_message(mail):
+    async with AsyncSendGridAPIClient(api_key='SENDGRID_API_KEY') as client:
+         await client.send(mail)
+
+from_email = Email("test@example.com")
+from_email = Email("mail@k-vinogradov.ru")
+to_email = To("kostya.vinogradov@gmail.com")
+subject = "Sending with SendGrid is Fun 2"
+content = Content("text/plain", "and easy to do anywhere, even with Python")
+mail = Mail(from_email, to_email, subject, content)
+
+asyncio.run(send_message(mail))
+```
+
 <a name="inbound"></a>
 # Processing Inbound Email
 
