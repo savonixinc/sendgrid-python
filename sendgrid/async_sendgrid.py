@@ -40,9 +40,18 @@ class AsyncSendGridAPIClient(SendGridAPIClient):
         *args,
         client_session:Optional[aiohttp.ClientSession]=None,
         **kwargs):
+        """Create AsyncSendGridAPIClient instance
+
+        All arguments beside client_session are passed
+        to SendGridAPIClient instance
+        
+        :param Optional[aiohttp.ClientSession] client_session: ClientSession
+            instance, defaults to None
+        """
 
         self._client_session = None
         super().__init__(*args, **kwargs)
+        self.internal_client_session_used = False
         if client_session:
             self.set_client_session(client_session)
 
@@ -56,9 +65,21 @@ class AsyncSendGridAPIClient(SendGridAPIClient):
             await self.get_client_session().close()
     
     def get_client_session(self) -> Union[aiohttp.ClientSession, None]:
+        """Get applied aiohttp.ClientSession instance
+        
+        :return: Returns the instance of aiohttp.ClientSession
+                 that has been applied
+        :rtype: Union[aiohttp.ClientSession, None]
+        """
         return self._client_session
     
     def set_client_session(self, session: aiohttp.ClientSession, internal: bool = False):
+        """Apply aiohttp.ClientSession instance
+        
+        :param aiohttp.ClientSession session: aiohttp.ClientSession instance
+        :param bool internal: treat session as internal (don't close it on
+                              context manager exit),defaults to False
+        """
         self.client.set_client_session(session)
         self._client_session = session
         self.internal_client_session_used = internal

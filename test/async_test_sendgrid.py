@@ -15,10 +15,27 @@ host = "http://localhost:4010"
 class TestAsyncSendGridAPIClient(asynctest.TestCase):
 
     async def setUp(self):
-        self.sg = sendgrid.AsyncSendGridAPIClient(host=host)
+        client = sendgrid.AsyncSendGridAPIClient(host=host)
+        client.set_client_session(aiohttp.ClientSession())
+        self.sg = client
     
     async def tearDown(self):
-        await self.sg.close_client_session()
+        await self.sg.get_client_session().close()
+    
+    async def test_context_manager(self):
+        client = sendgrid.AsyncSendGridAPIClient(host=host)
+        self.assertIsNone(client.get_client_session())
+        async with client as context:
+            self.assertFalse(context.get_client_session().closed)
+        self.assertTrue(client.get_client_session().closed)
+    
+    async def test_set_client_session(self):
+        client = sendgrid.AsyncSendGridAPIClient(host=host)
+        self.assertIsNone(client.get_client_session())
+        session = aiohttp.ClientSession()
+        client.set_client_session(session)
+        self.assertEqual(client.get_client_session(), session)
+        await session.close()
 
     async def test_api_key_init(self):
         self.assertEqual(self.sg.api_key, os.environ.get('SENDGRID_API_KEY'))
@@ -26,7 +43,6 @@ class TestAsyncSendGridAPIClient(asynctest.TestCase):
         self.assertEqual(self.sg.api_key, self.sg.api_key)
         my_sendgrid = sendgrid.AsyncSendGridAPIClient(api_key="THISISMYKEY")
         self.assertEqual(my_sendgrid.api_key, "THISISMYKEY")
-        await my_sendgrid.close_client_session()
 
     async def test_api_key_setter(self):
         self.assertEqual(self.sg.api_key, os.environ.get('SENDGRID_API_KEY'))
