@@ -171,9 +171,9 @@ print(response.headers)
 
 ## Asynchronous Client
 
-To enable asyncio support install the package with `async` extra:
+To enable asyncio support install the package with `async` extra (**because of [pip issue](https://github.com/pypa/pip/issues/4957) `python-http-client` dependency with `async` extra has to be installed explicitly**)
 
-    pip install sendgrid[async]
+    pip install sendgrid[async] python-http-client[async]==3.2.6dev5
 
 ```python
 import asyncio

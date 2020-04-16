@@ -9,7 +9,7 @@ with open('sendgrid/version.py') as f:
     exec(f.read())
 
 def getRequires():
-    deps = ['python_http_client>=3.2.1']
+    deps = ['python-http-client==3.2.6dev5']
     return deps
 
 
@@ -29,7 +29,7 @@ setup(
     long_description=readme,
     install_requires=getRequires(),
     extras_require = {
-        'async': ['python_http_client[async]>=3.2.1'],
+        'async': ['python-http-client[async]==3.2.6dev5'],
     },
     python_requires='>=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*',
     classifiers=[
