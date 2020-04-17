@@ -185,9 +185,8 @@ async def send_message(mail):
     async with AsyncSendGridAPIClient(api_key='SENDGRID_API_KEY') as client:
          await client.send(mail)
 
-from_email = Email("test@example.com")
-from_email = Email("mail@k-vinogradov.ru")
-to_email = To("kostya.vinogradov@gmail.com")
+from_email = Email("sender@example.com")
+to_email = To("recipient@example.com")
 subject = "Sending with SendGrid is Fun 2"
 content = Content("text/plain", "and easy to do anywhere, even with Python")
 mail = Mail(from_email, to_email, subject, content)
