@@ -28,3 +28,4 @@ if sys.version_info >= (3, 5):
         from .async_sendgrid import AsyncSendGridAPIClient
     except ImportError:
         pass
+
