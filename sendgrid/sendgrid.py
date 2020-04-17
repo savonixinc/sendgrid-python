@@ -66,7 +66,7 @@ class SendGridAPIClient(object):
             host=self.host,
             request_headers=self._default_headers,
             version=3)
-    
+
     @property
     def _default_headers(self):
         """Set the default header for a Twilio SendGrid v3 API call"""
