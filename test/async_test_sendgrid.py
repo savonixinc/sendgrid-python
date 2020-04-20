@@ -8,7 +8,6 @@ import sendgrid
 from sendgrid.helpers.endpoints.ip.unassigned import unassigned
 from sendgrid.helpers.mail import *
 
-
 host = "http://localhost:4010"
 
 
@@ -18,17 +17,25 @@ class TestAsyncSendGridAPIClient(asynctest.TestCase):
         client = sendgrid.AsyncSendGridAPIClient(host=host)
         client.set_client_session(aiohttp.ClientSession())
         self.sg = client
-    
+
     async def tearDown(self):
         await self.sg.get_client_session().close()
-    
+
     async def test_context_manager(self):
         client = sendgrid.AsyncSendGridAPIClient(host=host)
         self.assertIsNone(client.get_client_session())
         async with client as context:
             self.assertFalse(context.get_client_session().closed)
         self.assertTrue(client.get_client_session().closed)
-    
+
+        client = sendgrid.AsyncSendGridAPIClient(
+            host=host, client_session=aiohttp.ClientSession()
+        )
+        async with client as context:
+            self.assertFalse(context.get_client_session().closed)
+        self.assertFalse(client.get_client_session().closed)
+        await client.get_client_session().close()
+
     async def test_set_client_session(self):
         client = sendgrid.AsyncSendGridAPIClient(host=host)
         self.assertIsNone(client.get_client_session())
@@ -53,8 +60,8 @@ class TestAsyncSendGridAPIClient(asynctest.TestCase):
     async def test_impersonate_subuser_init(self):
         temp_subuser = 'abcxyz@this.is.a.test.subuser'
         async with sendgrid.AsyncSendGridAPIClient(
-            host=host,
-            impersonate_subuser=temp_subuser) as sg_impersonate:
+                host=host,
+                impersonate_subuser=temp_subuser) as sg_impersonate:
             self.assertEqual(sg_impersonate.impersonate_subuser, temp_subuser)
 
     def test_useragent(self):
@@ -1136,6 +1143,153 @@ class TestAsyncSendGridAPIClient(asynctest.TestCase):
         headers = {'X-Mock': 202}
         response = await self.sg.client.mail.send.post(
             request_body=data, request_headers=headers)
+        self.assertEqual(response.status_code, 202)
+
+    async def test_mail_send(self):
+        data = {
+            "asm": {
+                "group_id": 1,
+                "groups_to_display": [
+                    1,
+                    2,
+                    3
+                ]
+            },
+            "attachments": [
+                {
+                    "content": "[BASE64 encoded content block here]",
+                    "content_id": "ii_139db99fdb5c3704",
+                    "disposition": "inline",
+                    "filename": "file1.jpg",
+                    "name": "file1",
+                    "type": "jpg"
+                }
+            ],
+            "batch_id": "[YOUR BATCH ID GOES HERE]",
+            "categories": [
+                "category1",
+                "category2"
+            ],
+            "content": [
+                {
+                    "type": "text/html",
+                    "value": "<html><p>Hello, world!</p><img "
+                             "src=[CID GOES HERE]></img></html>"
+                }
+            ],
+            "custom_args": {
+                "New Argument 1": "New Value 1",
+                "activationAttempt": "1",
+                "customerAccountNumber": "[CUSTOMER ACCOUNT NUMBER GOES HERE]"
+            },
+            "from": {
+                "email": "sam.smith@example.com",
+                "name": "Sam Smith"
+            },
+            "headers": {},
+            "ip_pool_name": "[YOUR POOL NAME GOES HERE]",
+            "mail_settings": {
+                "bcc": {
+                    "email": "ben.doe@example.com",
+                    "enable": True
+                },
+                "bypass_list_management": {
+                    "enable": True
+                },
+                "footer": {
+                    "enable": True,
+                    "html": "<p>Thanks</br>The SendGrid Team</p>",
+                    "text": "Thanks,/n The SendGrid Team"
+                },
+                "sandbox_mode": {
+                    "enable": False
+                },
+                "spam_check": {
+                    "enable": True,
+                    "post_to_url": "http://example.com/compliance",
+                    "threshold": 3
+                }
+            },
+            "personalizations": [
+                {
+                    "bcc": [
+                        {
+                            "email": "sam.doe@example.com",
+                            "name": "Sam Doe"
+                        }
+                    ],
+                    "cc": [
+                        {
+                            "email": "jane.doe@example.com",
+                            "name": "Jane Doe"
+                        }
+                    ],
+                    "custom_args": {
+                        "New Argument 1": "New Value 1",
+                        "activationAttempt": "1",
+                        "customerAccountNumber":
+                            "[CUSTOMER ACCOUNT NUMBER GOES HERE]"
+                    },
+                    "headers": {
+                        "X-Accept-Language": "en",
+                        "X-Mailer": "MyApp"
+                    },
+                    "send_at": 1409348513,
+                    "subject": "Hello, World!",
+                    "substitutions": {
+                        "id": "substitutions",
+                        "type": "object"
+                    },
+                    "to": [
+                        {
+                            "email": "john.doe@example.com",
+                            "name": "John Doe"
+                        }
+                    ]
+                }
+            ],
+            "reply_to": {
+                "email": "sam.smith@example.com",
+                "name": "Sam Smith"
+            },
+            "sections": {
+                "section": {
+                    ":sectionName1": "section 1 text",
+                    ":sectionName2": "section 2 text"
+                }
+            },
+            "send_at": 1409348513,
+            "subject": "Hello, World!",
+            "template_id": "[YOUR TEMPLATE ID GOES HERE]",
+            "tracking_settings": {
+                "click_tracking": {
+                    "enable": True,
+                    "enable_text": True
+                },
+                "ganalytics": {
+                    "enable": True,
+                    "utm_campaign": "[NAME OF YOUR REFERRER SOURCE]",
+                    "utm_content": "[USE THIS SPACE TO DIFFERENTIATE "
+                                   "YOUR EMAIL FROM ADS]",
+                    "utm_medium": "[NAME OF YOUR MARKETING MEDIUM e.g. email]",
+                    "utm_name": "[NAME OF YOUR CAMPAIGN]",
+                    "utm_term": "[IDENTIFY PAID KEYWORDS HERE]"
+                },
+                "open_tracking": {
+                    "enable": True,
+                    "substitution_tag": "%opentrack"
+                },
+                "subscription_tracking": {
+                    "enable": True,
+                    "html": "If you would like to unsubscribe and stop "
+                            "receiving these emails <% clickhere %>.",
+                    "substitution_tag": "<%click here%>",
+                    "text": "If you would like to unsubscribe and stop "
+                            "receiving these emails <% click here %>."
+                }
+            }
+        }
+        response = await self.sg.send(data)
         self.assertEqual(response.status_code, 202)
 
     async def test_mail_settings_get(self):

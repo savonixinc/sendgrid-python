@@ -1,6 +1,6 @@
 import sys
 
-if sys.version_info < (3, 5):
+if sys.version_info < (3, 5):  # pragma: no cover
     raise ImportError("Python 3.5 or later is required")
 
 from typing import Optional, Union
