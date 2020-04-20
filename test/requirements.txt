@@ -4,5 +4,3 @@ six
 coverage
 codecov
 mock
-pytest
-asynctest
