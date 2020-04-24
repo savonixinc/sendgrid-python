@@ -79,7 +79,7 @@ class AsyncSendGridAPIClient(SendGridAPIClient):
         :param bool internal: treat session as internal (don't close it on
                               context manager exit),defaults to False
         """
-        self.client.set_client_session(session)
+        self.client.client_session = session
         self._client_session = session
         self.internal_client_session_used = internal
 
