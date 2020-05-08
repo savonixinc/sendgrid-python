@@ -20,6 +20,10 @@ class UnitTests(unittest.TestCase):
         cls.devnull = open(os.devnull, 'w')
         prism_cmd = None
 
+    @classmethod
+    def tearDownClass(cls):
+        cls.devnull.close()
+
     def test_api_key_init(self):
         self.assertEqual(self.sg.api_key, os.environ.get('SENDGRID_API_KEY'))
         # Support the previous naming convention for API keys
