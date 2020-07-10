@@ -14,6 +14,7 @@ Available subpackages
 helpers
     Modules to help with common tasks.
 """
+import sys
 
 from .version import __version__
 from .sendgrid import SendGridAPIClient  # noqa
@@ -21,3 +22,10 @@ from .helpers.mail import *  # noqa
 from .helpers.endpoints import *  # noqa
 # from .helpers.inbound import *  # noqa
 from .helpers.stats import *  # noqa
+
+if sys.version_info >= (3, 5):
+    try:
+        from .async_sendgrid import AsyncSendGridAPIClient
+    except ImportError:
+        pass
+
